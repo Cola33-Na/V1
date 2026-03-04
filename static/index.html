@@ -22,6 +22,138 @@
       position: relative;
     }
     
+    /* 左上角功能鍵 */
+    .top-left-controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 200;
+      display: flex;
+      gap: 10px;
+    }
+    
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid #667eea;
+      color: #667eea;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    .icon-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: scale(1.1);
+    }
+    
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* 模態框樣式 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      z-index: 300;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-overlay.show {
+      display: flex;
+    }
+    
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+      from { opacity: 0; transform: translateY(-50px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    .modal-header {
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+      text-align: center;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 15px;
+    }
+    
+    .modal-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 600;
+      color: #667eea;
+      background: #f8f9fa;
+    }
+    
+    .modal-input:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .modal-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .modal-btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .modal-btn-secondary {
+      background: #f0f0f0;
+      color: #666;
+    }
+    
+    .modal-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
     /* 左側：搜尋介面 */
     .left-panel {
       flex: 1;
@@ -32,6 +164,7 @@
       flex-direction: column;
       align-items: center;
       -webkit-overflow-scrolling: touch;
+      padding-top: 80px; /* 為左上角按鈕留空間 */
     }
     
     .search-container {
@@ -107,12 +240,6 @@
     
     .error-hint.show {
       display: block;
-    }
-    
-    .input-hint {
-      font-size: 12px;
-      color: #999;
-      margin-top: 5px;
     }
     
     button {
@@ -204,8 +331,8 @@
       min-height: 100px;
       max-height: 300px;
       overflow-y: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 13px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 14px;
       line-height: 1.6;
       color: #333;
       -webkit-overflow-scrolling: touch;
@@ -220,10 +347,10 @@
       justify-content: center;
       align-items: center;
       text-align: center;
+      gap: 15px;
     }
     
     .location-count-section {
-      margin-bottom: 15px;
       width: 100%;
     }
     
@@ -231,21 +358,31 @@
       width: 100%;
       border-top: 2px solid #e0e0e0;
       padding-top: 15px;
-      margin-top: auto;
     }
     
     .location-label {
       font-size: 13px;
       color: #666;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      font-weight: 600;
     }
     
     .location-value {
-      font-size: 14px;
+      font-size: 16px;
       color: #333;
       font-weight: 600;
       word-break: break-all;
       line-height: 1.4;
+      background: #f0f4ff;
+      padding: 10px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .location-value:empty::before {
+      content: '未設定';
+      color: #999;
+      font-style: italic;
     }
     
     .empty-state {
@@ -283,11 +420,11 @@
     }
     
     .library-count {
-      font-size: 24px;
+      font-size: 36px;
       font-weight: bold;
       color: #667eea;
       text-align: center;
-      padding: 20px;
+      padding: 10px;
     }
     
     .library-table {
@@ -449,19 +586,6 @@
       box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
     }
     
-    /* 顯示欄目輸入框樣式 */
-    #displayColumnInput {
-      background: #fff8e1;
-      border-color: #ffa726;
-      font-weight: 600;
-    }
-    
-    #displayColumnInput:focus {
-      background: white;
-      box-shadow: 0 0 0 4px rgba(255, 167, 38, 0.2);
-      border-color: #f57c00;
-    }
-    
     /* 手機端切換按鈕 */
     .mobile-toggle {
       display: none;
@@ -501,6 +625,17 @@
         height: auto;
       }
       
+      .top-left-controls {
+        top: 10px;
+        left: 10px;
+      }
+      
+      .icon-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+      }
+      
       .container {
         flex-direction: column;
         height: auto;
@@ -514,6 +649,7 @@
         min-height: 100vh;
         min-height: 100dvh;
         padding-bottom: 100px;
+        padding-top: 70px; /* 為手機端按鈕留空間 */
         overflow-y: visible;
         display: block;
       }
@@ -572,34 +708,42 @@
       .result-box {
         max-height: 250px;
         min-height: 100px;
-        font-size: 13px;
+        font-size: 14px;
         width: 100%;
       }
       
-      /* 可選項目 & 位置 手機端調整 */
       .location-display {
         flex-direction: row;
         align-items: stretch;
+        text-align: left;
       }
       
       .location-count-section {
-        flex: 1;
-        margin-bottom: 0;
-        border-right: 2px solid #e0e0e0;
-        padding-right: 15px;
+        flex: 0 0 40%;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        align-items: center;
       }
       
       .location-position-section {
         flex: 1;
         border-top: none;
+        border-left: 2px solid #e0e0e0;
         padding-top: 0;
         padding-left: 15px;
         display: flex;
         flex-direction: column;
         justify-content: center;
+      }
+      
+      .location-value {
+        font-size: 14px;
+        padding: 8px;
+      }
+      
+      .library-count {
+        font-size: 28px;
       }
       
       .book-info-grid {
@@ -703,30 +847,32 @@
       .result-box {
         max-height: 200px;
         min-height: 80px;
-        font-size: 12px;
+        font-size: 13px;
+      }
+      
+      .location-display {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .location-count-section {
+        flex: none;
+        border-right: none;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+        padding-left: 0;
+      }
+      
+      .location-position-section {
+        border-left: none;
+        border-top: 2px solid #e0e0e0;
+        padding-top: 10px;
+        padding-left: 0;
       }
       
       .book-info-label,
       .book-info-value {
         font-size: 11px;
-      }
-      
-      /* 超小屏幕改為垂直排列 */
-      .location-display {
-        flex-direction: column;
-      }
-      
-      .location-count-section {
-        border-right: none;
-        border-bottom: 2px solid #e0e0e0;
-        padding-right: 0;
-        padding-bottom: 10px;
-        margin-bottom: 10px;
-      }
-      
-      .location-position-section {
-        padding-left: 0;
-        padding-top: 10px;
       }
     }
     
@@ -743,6 +889,30 @@
   </style>
 </head>
 <body>
+  <!-- 左上角控制按鈕 -->
+  <div class="top-left-controls">
+    <button class="icon-btn" onclick="openDisplayColumnModal()" title="設定顯示圖書館數量">
+      ⚙️
+    </button>
+  </div>
+  
+  <!-- 顯示欄目設定模態框 -->
+  <div class="modal-overlay" id="displayColumnModal" onclick="closeDisplayColumnModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">請輸入顯示圖書館的數量</div>
+      <input type="text" 
+             id="displayColumnInput" 
+             class="modal-input" 
+             placeholder="請輸入數字..."
+             inputmode="numeric"
+             pattern="[0-9]*">
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="closeDisplayColumnModal()">取消</button>
+        <button class="modal-btn modal-btn-primary" onclick="saveDisplayColumnFromModal()">儲存</button>
+      </div>
+    </div>
+  </div>
+  
   <!-- 遮罩層（手機端點擊關閉面板） -->
   <div class="overlay" id="overlay" onclick="togglePanel()"></div>
   
@@ -752,13 +922,6 @@
       <div class="search-container">
         <h1>🔍 資料查詢</h1>
         <p class="subtitle">輸入關鍵字後按 Enter</p>
-        
-        <!-- 新增：顯示欄目 (F1) -->
-        <div class="input-group">
-          <label for="displayColumnInput">📋 顯示欄目 (F1)</label>
-          <input type="text" id="displayColumnInput" placeholder="載入中..." onblur="saveDisplayColumn()">
-          <div class="input-hint">修改後自動儲存至 Google Sheet</div>
-        </div>
         
         <div class="input-group">
           <label for="inputBox">輸入關鍵字（14位純數字）</label>
@@ -853,12 +1016,13 @@
     // 本地資料緩存
     let manualSelectData = [];
     let isPanelOpen = false;
-    let displayColumnValue = ''; // 緩存顯示欄目值
+    let displayColumnValue = '';
+    let currentPosition = ''; // 儲存D2位置資料
     
     // 頁面載入時自動載入資料
     window.onload = function() {
       loadManualSelect();
-      loadDisplayColumn(); // 載入顯示欄目
+      loadDisplayColumn();
       
       if (window.innerWidth <= 768) {
         closePanel();
@@ -874,7 +1038,104 @@
       }
     });
     
-    // 切換面板顯示（手機端用）
+    //========== 顯示欄目模態框功能 ==========
+    
+    function openDisplayColumnModal() {
+      const modal = document.getElementById('displayColumnModal');
+      const input = document.getElementById('displayColumnInput');
+      input.value = displayColumnValue || '';
+      modal.classList.add('show');
+      input.focus();
+    }
+    
+    function closeDisplayColumnModal(event) {
+      if (event && event.target !== document.getElementById('displayColumnModal')) return;
+      document.getElementById('displayColumnModal').classList.remove('show');
+    }
+    
+    async function saveDisplayColumnFromModal() {
+      const input = document.getElementById('displayColumnInput');
+      const newValue = input.value.trim();
+      
+      if (!newValue) {
+        showStatus('請輸入數值', 'error');
+        return;
+      }
+      
+      if (!/^\d+$/.test(newValue)) {
+        showStatus('請輸入純數字', 'error');
+        return;
+      }
+      
+      try {
+        showStatus('💾 儲存中...', 'info', true);
+        
+        const response = await fetchWithTimeout(
+          `${GAS_API_URL}?action=updateDisplayColumn&value=${encodeURIComponent(newValue)}`,
+          {},
+          10000
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤');
+        }
+        
+        if (data.success) {
+          displayColumnValue = newValue;
+          closeDisplayColumnModal();
+          showStatus('✅ 設定已更新', 'success', true);
+        } else {
+          throw new Error(data.error || '儲存失敗');
+        }
+      } catch (error) {
+        console.error('儲存顯示欄目錯誤:', error);
+        showStatus('❌ 儲存失敗: ' + error.message, 'error', true);
+      }
+    }
+    
+    // 載入顯示欄目 (F1)
+    async function loadDisplayColumn() {
+      try {
+        console.log('載入顯示欄目 (F1)...');
+        const response = await fetchWithTimeout(
+          `${GAS_API_URL}?action=getDisplayColumn`,
+          {},
+          10000
+        );
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤');
+        }
+        
+        if (data.success) {
+          displayColumnValue = data.value || '';
+          console.log('顯示欄目載入成功:', data.value);
+        } else {
+          console.error('載入顯示欄目失敗:', data.error);
+        }
+      } catch (error) {
+        console.error('載入顯示欄目錯誤:', error);
+      }
+    }
+    
+    //========== 面板控制 ==========
+    
     function togglePanel() {
       const panel = document.getElementById('rightPanel');
       const overlay = document.getElementById('overlay');
@@ -938,93 +1199,25 @@
       }
     }
     
-    //========== 顯示欄目功能 (F1) ==========
-    
-    // 載入顯示欄目 (F1)
-    async function loadDisplayColumn() {
-      try {
-        console.log('載入顯示欄目 (F1)...');
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=getDisplayColumn`,
-          {},
-          10000
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error('JSON解析錯誤');
-        }
-        
-        if (data.success) {
-          const input = document.getElementById('displayColumnInput');
-          input.value = data.value || '';
-          displayColumnValue = data.value || '';
-          console.log('顯示欄目載入成功:', data.value);
-        } else {
-          console.error('載入顯示欄目失敗:', data.error);
-        }
-      } catch (error) {
-        console.error('載入顯示欄目錯誤:', error);
-        showStatus('載入顯示欄目失敗', 'error');
-      }
-    }
-    
-    // 儲存顯示欄目 (F1) - 當輸入框失去焦點時呼叫
-    async function saveDisplayColumn() {
-      const input = document.getElementById('displayColumnInput');
-      const newValue = input.value.trim();
-      
-      // 如果值沒有改變，不需要儲存
-      if (newValue === displayColumnValue) return;
-      
-      try {
-        console.log('儲存顯示欄目 (F1):', newValue);
-        showStatus('💾 儲存中...', 'info', true);
-        
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=updateDisplayColumn&value=${encodeURIComponent(newValue)}`,
-          {},
-          10000
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error('JSON解析錯誤');
-        }
-        
-        if (data.success) {
-          displayColumnValue = newValue;
-          showStatus('✅ 顯示欄目已更新', 'success', true);
-          console.log('顯示欄目儲存成功');
-        } else {
-          throw new Error(data.error || '儲存失敗');
-        }
-      } catch (error) {
-        console.error('儲存顯示欄目錯誤:', error);
-        showStatus('❌ 儲存失敗: ' + error.message, 'error', true);
-        // 恢復原值
-        input.value = displayColumnValue;
-      }
-    }
-    
     //========== 搜尋功能（左側） ==========
     
     function validateInput(value) {
       return /^\d{14}$/.test(value);
+    }
+    
+    // 清理HTML內容的函數（處理<div>和<span>標籤）
+    function cleanHtmlContent(html) {
+      if (!html) return '';
+      
+      // 創建臨時DOM元素來解析HTML
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      
+      // 獲取純文本內容，移除所有標籤
+      let text = temp.textContent || temp.innerText || '';
+      
+      // 清理多餘空白
+      return text.trim();
     }
     
     async function submitQuery() {
@@ -1063,7 +1256,7 @@
         }
         
         const text = await response.text();
-        console.log('原始響應:', text.substring(0, 200));
+        console.log('原始響應:', text.substring(0, 500));
         
         let data;
         try {
@@ -1079,7 +1272,12 @@
           if (data.a1Value && data.a1Value.toString().includes('找不到相應值')) {
             showNotFound(data.a1Value);
             document.getElementById('addInput').value = '';
+            currentPosition = '';
           } else {
+            // 儲存位置資料（清理HTML）
+            currentPosition = data.position ? cleanHtmlContent(data.position) : '';
+            console.log('D2位置資料:', currentPosition);
+            
             displaySearchResults(data);
             showStatus(`✅ 共 ${data.rowCount} 筆結果`, 'success', true);
             document.getElementById('addInput').value = inputValue;
@@ -1088,6 +1286,7 @@
         } else {
           showStatus('❌ ' + (data.error || '未知錯誤'), 'error', true);
           document.getElementById('addInput').value = '';
+          currentPosition = '';
         }
       } catch (error) {
         console.error('請求錯誤:', error);
@@ -1103,6 +1302,7 @@
         
         showStatus('❌ ' + errorMsg, 'error', true);
         document.getElementById('addInput').value = '';
+        currentPosition = '';
       } finally {
         btn.classList.remove('loading');
         btn.textContent = '送出查詢';
@@ -1122,18 +1322,22 @@
       const bookInfo = data.bookInfo || {};
       const libraries = data.libraries || [];
       const libraryCount = data.libraryCount || 0;
-      const position = data.position || 'N/A'; // D2欄位置資料
+      
+      // 使用清理後的position資料（如果data.position存在，否則使用currentPosition）
+      const position = data.position ? cleanHtmlContent(data.position) : currentPosition;
+      
+      console.log('顯示位置資料:', position);
       
       // 修改：顯示可選項目數量與位置 (D2)
       document.getElementById('libraryCountBox').innerHTML = `
         <div class="location-display">
           <div class="location-count-section">
             <div class="location-label">可選項目數量</div>
-            <div class="library-count" style="font-size: 32px; padding: 10px;">${libraryCount}</div>
+            <div class="library-count">${libraryCount}</div>
           </div>
           <div class="location-position-section">
             <div class="location-label">位置 (D2)</div>
-            <div class="location-value">${position}</div>
+            <div class="location-value">${position || '未設定'}</div>
           </div>
         </div>
       `;
@@ -1408,11 +1612,10 @@
       if (e.key === 'Enter') submitQuery();
     });
     
-    // 顯示欄目輸入框事件監聽
-    document.getElementById('displayColumnInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        this.blur(); // 觸發儲存
-      }
+    // 模態框輸入框限制數字
+    document.getElementById('displayColumnInput').addEventListener('input', function() {
+      const value = this.value.replace(/\D/g, '');
+      if (this.value !== value) this.value = value;
     });
     
     if (window.location.search.includes('debug=true')) {
