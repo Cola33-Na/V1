@@ -22,7 +22,6 @@
       position: relative;
     }
     
-    /* 左上角功能鍵 */
     .top-left-controls {
       position: fixed;
       top: 20px;
@@ -55,11 +54,6 @@
       transform: scale(1.1);
     }
     
-    .icon-btn:active {
-      transform: scale(0.95);
-    }
-    
-    /* 模態框樣式 */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -170,12 +164,6 @@
       color: #666;
     }
     
-    .modal-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
-    /* 左側：搜尋介面 */
     .left-panel {
       flex: 1;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -195,12 +183,6 @@
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       width: 100%;
       max-width: 1350px;
-      animation: slideIn 0.5s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-30px); }
-      to { opacity: 1; transform: translateY(0); }
     }
     
     h1 {
@@ -277,8 +259,6 @@
       margin-bottom: 25px;
       position: relative;
       overflow: hidden;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
     }
     
     button:hover:not(:disabled) {
@@ -293,7 +273,6 @@
     
     button.loading {
       pointer-events: none;
-      opacity: 0.8;
     }
     
     button.loading::after {
@@ -360,7 +339,6 @@
       word-break: break-all;
     }
     
-    /* 可選項目 & 位置 特殊樣式 */
     .location-display {
       display: flex;
       flex-direction: column;
@@ -484,16 +462,11 @@
       background: white;
     }
     
-    .library-table tr:hover td {
-      background: #f5f5f5;
-    }
-    
     .text-muted {
       color: #999;
       font-style: italic;
     }
     
-    /* 右側：ManualSelect 管理面板 */
     .right-panel {
       width: 350px;
       background: white;
@@ -539,17 +512,6 @@
       min-height: 100px;
     }
     
-    .display-box.updating {
-      background: #e8f5e9;
-      border-color: #4caf50;
-    }
-    
-    .button-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    
     .btn {
       padding: 12px;
       border: none;
@@ -562,21 +524,11 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    .btn:active:not(:disabled) {
-      transform: scale(0.98);
     }
     
     .btn-primary {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-    }
-    
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
     }
     
     .btn-secondary {
@@ -614,12 +566,6 @@
       letter-spacing: 2px;
     }
     
-    #addInput:focus {
-      background: white;
-      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-    }
-    
-    /* 手機端切換按鈕 */
     .mobile-toggle {
       display: none;
       position: fixed;
@@ -651,294 +597,61 @@
       font-size: 18px;
     }
     
-    /* ==================== 手機端適配 ==================== */
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 40;
+    }
+    
+    .overlay.show {
+      display: block;
+    }
+    
     @media screen and (max-width: 768px) {
-      body {
-        overflow: auto;
-        height: auto;
-      }
-      
-      .top-left-controls {
-        top: 10px;
-        left: 10px;
-      }
-      
-      .icon-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
-      }
-      
-      .container {
-        flex-direction: column;
-        height: auto;
-        min-height: 100vh;
-        min-height: 100dvh;
-      }
-      
-      .left-panel {
-        width: 100%;
-        padding: 20px;
-        min-height: 100vh;
-        min-height: 100dvh;
-        padding-bottom: 100px;
-        padding-top: 70px;
-        overflow-y: visible;
-        display: block;
-      }
-      
-      .search-container {
-        padding: 20px;
-        max-width: 100%;
-        margin-bottom: 20px;
-      }
-      
-      h1 {
-        font-size: 24px;
-      }
-      
-      .subtitle {
-        font-size: 14px;
-      }
-      
-      input[type="text"] {
-        padding: 15px;
-        font-size: 16px;
-      }
-      
-      button {
-        padding: 15px;
-        font-size: 16px;
-        width: 100%;
-        margin-left: 0;
-        margin-right: 0;
-      }
-      
-      .results-container {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        width: 100%;
-        margin: 0 0 20px 0;
-        padding: 0;
-      }
-      
-      .result-section {
-        width: 100%;
-        min-width: 100%;
-        max-width: 100%;
-        padding: 15px;
-        margin: 0;
-        flex: none;
-      }
-      
-      .result-section h3 {
-        font-size: 15px;
-        margin-bottom: 10px;
-        padding-bottom: 8px;
-      }
-      
-      .result-box {
-        max-height: 250px;
-        min-height: 100px;
-        font-size: 14px;
-        width: 100%;
-      }
-      
-      .location-display {
-        flex-direction: row;
-        align-items: stretch;
-        text-align: left;
-      }
-      
-      .location-count-section {
-        flex: 0 0 40%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-      
-      .location-position-section {
-        flex: 1;
-        border-top: none;
-        border-left: 2px solid #e0e0e0;
-        padding-top: 0;
-        padding-left: 15px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-      
-      .location-value {
-        font-size: 14px;
-        padding: 8px;
-      }
-      
-      .library-count {
-        font-size: 28px;
-      }
-      
-      .book-info-grid {
-        gap: 6px 10px;
-      }
-      
-      .book-info-label {
-        font-size: 12px;
-      }
-      
-      .book-info-value {
-        font-size: 12px;
-      }
-      
-      .result-section.full-width {
-        width: 100%;
-        min-width: 100%;
-        max-width: 100%;
-      }
-      
-      .result-section.full-width .result-box {
-        overflow-x: auto;
-        overflow-y: visible;
-        -webkit-overflow-scrolling: touch;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        background: white;
-        padding: 0;
-        max-height: none;
-        min-height: 150px;
-      }
-      
-      .library-table {
-        min-width: 800px;
-        font-size: 12px;
-        margin: 0;
-      }
-      
-      .library-table th,
-      .library-table td {
-        padding: 8px 6px;
-        white-space: nowrap;
-      }
-      
-      .right-panel {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 85%;
-        height: 100vh;
-        height: 100dvh;
-        transform: translateX(100%);
-        box-shadow: -5px 0 25px rgba(0,0,0,0.3);
-      }
-      
-      .right-panel.open {
-        transform: translateX(0);
-      }
-      
-      .mobile-toggle {
-        display: flex;
-      }
-      
-      .close-panel-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      
-      .overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        height: 100dvh;
-        background: rgba(0,0,0,0.5);
-        z-index: 40;
-      }
-      
-      .overlay.show {
-        display: block;
-      }
+      body { overflow: auto; height: auto; }
+      .top-left-controls { top: 10px; left: 10px; }
+      .icon-btn { width: 40px; height: 40px; font-size: 18px; }
+      .container { flex-direction: column; height: auto; min-height: 100vh; }
+      .left-panel { width: 100%; padding: 20px; padding-top: 70px; overflow-y: visible; }
+      .search-container { padding: 20px; max-width: 100%; }
+      h1 { font-size: 24px; }
+      .subtitle { font-size: 14px; }
+      input[type="text"] { padding: 15px; font-size: 16px; }
+      button { padding: 15px; font-size: 16px; width: 100%; }
+      .results-container { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+      .result-section { width: 100%; min-width: 100%; padding: 15px; }
+      .result-box { max-height: 250px; min-height: 100px; font-size: 14px; }
+      .location-display { flex-direction: row; align-items: stretch; text-align: left; }
+      .location-count-section { flex: 0 0 40%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+      .location-position-section { flex: 1; border-top: none; border-left: 2px solid #e0e0e0; padding-top: 0; padding-left: 15px; display: flex; flex-direction: column; justify-content: center; }
+      .right-panel { position: fixed; top: 0; right: 0; width: 85%; height: 100vh; transform: translateX(100%); }
+      .right-panel.open { transform: translateX(0); }
+      .mobile-toggle { display: flex; }
+      .close-panel-btn { display: flex; align-items: center; justify-content: center; }
     }
     
     @media screen and (max-width: 380px) {
-      .results-container {
-        gap: 12px;
-      }
-      
-      .result-section {
-        padding: 12px;
-      }
-      
-      .result-section h3 {
-        font-size: 14px;
-      }
-      
-      .result-box {
-        max-height: 200px;
-        min-height: 80px;
-        font-size: 13px;
-      }
-      
-      .location-display {
-        flex-direction: column;
-        text-align: center;
-      }
-      
-      .location-count-section {
-        flex: none;
-        border-right: none;
-        border-bottom: 2px solid #e0e0e0;
-        padding-bottom: 10px;
-        padding-left: 0;
-      }
-      
-      .location-position-section {
-        border-left: none;
-        border-top: 2px solid #e0e0e0;
-        padding-top: 10px;
-        padding-left: 0;
-      }
-      
-      .book-info-label,
-      .book-info-value {
-        font-size: 11px;
-      }
-    }
-    
-    @media screen and (min-width: 769px) and (max-width: 1024px) {
-      .right-panel {
-        width: 300px;
-      }
-      
-      .search-container {
-        max-width: 100%;
-      }
+      .location-display { flex-direction: column; text-align: center; }
+      .location-count-section { border-right: none; border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+      .location-position-section { border-left: none; border-top: 2px solid #e0e0e0; padding-top: 10px; padding-left: 0; }
     }
   </style>
 </head>
 <body>
-  <!-- 左上角控制按鈕 -->
   <div class="top-left-controls">
-    <button class="icon-btn" onclick="openDisplayColumnModal()" title="設定顯示圖書館數量 (F1)">
-      ⚙️
-    </button>
+    <button class="icon-btn" onclick="openDisplayColumnModal()" title="設定顯示圖書館數量 (F1)">⚙️</button>
   </div>
   
-  <!-- 顯示欄目設定模態框 -->
   <div class="modal-overlay" id="displayColumnModal" onclick="closeDisplayColumnModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">請輸入顯示圖書館的數量</div>
       <div class="modal-subtitle">輸入 0-999 的數字，或留空</div>
-      <input type="text" 
-             id="displayColumnInput" 
-             class="modal-input" 
-             placeholder="例如：10"
-             inputmode="numeric"
-             pattern="[0-9]*"
-             maxlength="3">
+      <input type="text" id="displayColumnInput" class="modal-input" placeholder="例如：10" inputmode="numeric" pattern="[0-9]*" maxlength="3">
       <div class="modal-error" id="modalError"></div>
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeDisplayColumnModal()">取消</button>
@@ -947,11 +660,9 @@
     </div>
   </div>
   
-  <!-- 遮罩層（手機端點擊關閉面板） -->
   <div class="overlay" id="overlay" onclick="togglePanel()"></div>
   
   <div class="container">
-    <!-- 左側：搜尋介面 -->
     <div class="left-panel">
       <div class="search-container">
         <h1>🔍 資料查詢</h1>
@@ -994,7 +705,6 @@
       </div>
     </div>
     
-    <!-- 右側：ManualSelect 管理面板 -->
     <div class="right-panel" id="rightPanel">
       <div class="panel-header">
         <span>📋 Manual Select</span>
@@ -1003,9 +713,7 @@
       
       <div class="panel-content">
         <div style="flex: 1; display: flex; flex-direction: column;">
-          <label style="font-size: 12px; color: #666; margin-bottom: 5px; font-weight: 600;">
-            目前內容（A欄）：
-          </label>
+          <label style="font-size: 12px; color: #666; margin-bottom: 5px; font-weight: 600;">目前內容（A欄）：</label>
           <textarea id="manualSelectDisplay" class="display-box" readonly placeholder="載入中..."></textarea>
         </div>
         
@@ -1015,22 +723,12 @@
         </div>
         
         <div class="button-group">
-          <button class="btn btn-primary" id="btnCopy" onclick="addToManualSelect()">
-            <span>📋</span> 複製（新增）
-          </button>
-          
+          <button class="btn btn-primary" id="btnCopy" onclick="addToManualSelect()"><span>📋</span> 複製（新增）</button>
           <div style="display: flex; gap: 8px;">
-            <button class="btn btn-danger" style="flex: 1; font-size: 12px; padding: 10px;" onclick="clearAll()">
-              清除全部
-            </button>
-            <button class="btn btn-warning" style="flex: 1; font-size: 12px; padding: 10px;" onclick="removeLast()">
-              清除最後
-            </button>
+            <button class="btn btn-danger" style="flex: 1; font-size: 12px; padding: 10px;" onclick="clearAll()">清除全部</button>
+            <button class="btn btn-warning" style="flex: 1; font-size: 12px; padding: 10px;" onclick="removeLast()">清除最後</button>
           </div>
-          
-          <button class="btn btn-secondary" onclick="exportToTxt()">
-            <span>💾</span> 匯出 TXT
-          </button>
+          <button class="btn btn-secondary" onclick="exportToTxt()"><span>💾</span> 匯出 TXT</button>
         </div>
         
         <div class="status-msg" id="manualStatus"></div>
@@ -1038,32 +736,22 @@
     </div>
   </div>
   
-  <!-- 手機端浮動切換按鈕 -->
-  <button class="mobile-toggle" id="mobileToggle" onclick="togglePanel()" title="開啟 Manual Select">
-    📋
-  </button>
+  <button class="mobile-toggle" id="mobileToggle" onclick="togglePanel()" title="開啟 Manual Select">📋</button>
 
   <script>
-    // API 基礎網址 - 請確保沒有空格！
+    // 【重要】請修改為您新部署的 GAS 網址，確保沒有空格
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwO7l6SgQLGXT-OW6jXfAW5km31AW9Twfg4qCVet2tHn33sApmOyVqelQd6gockpiiF/exec';
     
-    // 本地資料緩存
     let manualSelectData = [];
     let isPanelOpen = false;
     let displayColumnValue = '';
-    let currentPosition = '';
     
-    // 頁面載入時自動載入資料
     window.onload = function() {
       loadManualSelect();
       loadDisplayColumn();
-      
-      if (window.innerWidth <= 768) {
-        closePanel();
-      }
+      if (window.innerWidth <= 768) closePanel();
     };
     
-    // 監聽窗口大小變化
     window.addEventListener('resize', () => {
       if (window.innerWidth > 768) {
         document.getElementById('rightPanel').classList.remove('open');
@@ -1071,8 +759,6 @@
         isPanelOpen = false;
       }
     });
-    
-    //========== 顯示欄目模態框功能 ==========
     
     function openDisplayColumnModal() {
       const modal = document.getElementById('displayColumnModal');
@@ -1096,14 +782,12 @@
       const input = document.getElementById('displayColumnInput');
       errorDiv.textContent = msg;
       input.classList.add('error');
-      setTimeout(() => {
-        input.classList.remove('error');
-      }, 3000);
+      setTimeout(() => input.classList.remove('error'), 3000);
     }
     
     async function saveDisplayColumnFromModal() {
       const input = document.getElementById('displayColumnInput');
-      const newValue = input.value.trim();
+      let newValue = input.value.trim();
       
       // 驗證：必須為空白或0-999
       if (newValue !== '') {
@@ -1119,81 +803,56 @@
       }
       
       try {
-        console.log('正在儲存顯示欄目 (F1):', newValue);
+        console.log('儲存 F1:', newValue);
         showStatus('💾 儲存中...', 'info', true);
         
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=updateDisplayColumn&value=${encodeURIComponent(newValue)}`,
-          {},
-          15000
-        );
+        const url = `${GAS_API_URL}?action=updateDisplayColumn&value=${encodeURIComponent(newValue)}`;
+        console.log('URL:', url);
         
-        console.log('儲存回應狀態:', response.status);
+        const response = await fetchWithTimeout(url, {}, 15000);
         
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const text = await response.text();
-        console.log('儲存回應內容:', text);
+        console.log('回應:', text);
         
         let data;
         try {
           data = JSON.parse(text);
         } catch (e) {
-          console.error('JSON解析錯誤:', text);
-          throw new Error('伺服器返回格式錯誤');
+          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
         }
         
         if (data.success) {
           displayColumnValue = newValue;
           closeDisplayColumnModal();
-          showStatus('✅ 顯示欄目已更新至 F1', 'success', true);
-          console.log('儲存成功');
+          showStatus('✅ 設定已儲存至 F1', 'success', true);
         } else {
           throw new Error(data.error || '儲存失敗');
         }
       } catch (error) {
-        console.error('儲存顯示欄目錯誤:', error);
+        console.error('儲存錯誤:', error);
         showModalError('儲存失敗: ' + error.message);
         showStatus('❌ 儲存失敗', 'error', true);
       }
     }
     
-    // 載入顯示欄目 (F1)
     async function loadDisplayColumn() {
       try {
-        console.log('載入顯示欄目 (F1)...');
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=getDisplayColumn`,
-          {},
-          10000
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+        const response = await fetchWithTimeout(`${GAS_API_URL}?action=getDisplayColumn`, {}, 10000);
+        if (!response.ok) return;
         
         const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error('JSON解析錯誤');
-        }
+        const data = JSON.parse(text);
         
         if (data.success) {
           displayColumnValue = data.value || '';
-          console.log('顯示欄目載入成功:', displayColumnValue);
-        } else {
-          console.error('載入顯示欄目失敗:', data.error);
+          console.log('F1載入:', displayColumnValue);
         }
       } catch (error) {
-        console.error('載入顯示欄目錯誤:', error);
+        console.error('載入F1錯誤:', error);
       }
     }
-    
-    //========== 面板控制 ==========
     
     function togglePanel() {
       const panel = document.getElementById('rightPanel');
@@ -1212,30 +871,21 @@
     }
     
     function closePanel() {
-      const panel = document.getElementById('rightPanel');
-      const overlay = document.getElementById('overlay');
-      const toggleBtn = document.getElementById('mobileToggle');
-      
-      panel.classList.remove('open');
-      overlay.classList.remove('show');
+      document.getElementById('rightPanel').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
       isPanelOpen = false;
-      toggleBtn.style.display = 'flex';
+      document.getElementById('mobileToggle').style.display = 'flex';
     }
     
-    // 顯示狀態訊息
     function showStatus(msg, type = '', isSearch = false) {
       const statusEl = isSearch ? document.getElementById('searchStatus') : document.getElementById('manualStatus');
       statusEl.textContent = msg;
       statusEl.className = 'status-msg ' + type;
       if (type !== 'info') {
-        setTimeout(() => {
-          statusEl.textContent = '';
-          statusEl.className = 'status-msg';
-        }, 3000);
+        setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'status-msg'; }, 3000);
       }
     }
     
-    // 封裝 fetch 請求，處理超時和錯誤
     async function fetchWithTimeout(url, options = {}, timeout = 30000) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
@@ -1245,10 +895,7 @@
           ...options,
           signal: controller.signal,
           mode: 'cors',
-          headers: {
-            'Accept': 'application/json',
-            ...options.headers
-          }
+          headers: { 'Accept': 'application/json', ...options.headers }
         });
         clearTimeout(id);
         return response;
@@ -1258,54 +905,16 @@
       }
     }
     
-    //========== 搜尋功能（左側） ==========
+    function cleanHtmlContent(html) {
+      if (!html) return '';
+      if (!html.includes('<')) return html.trim();
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      return (temp.textContent || temp.innerText || '').trim();
+    }
     
     function validateInput(value) {
       return /^\d{14}$/.test(value);
-    }
-    
-    // 清理HTML內容的函數（處理<div>和<span>標籤）
-    function cleanHtmlContent(html) {
-      if (!html) return '';
-      
-      // 如果是純文字（不含<），直接返回
-      if (!html.includes('<')) return html.trim();
-      
-      // 創建臨時DOM元素來解析HTML
-      const temp = document.createElement('div');
-      temp.innerHTML = html;
-      
-      // 獲取純文本內容，移除所有標籤
-      let text = temp.textContent || temp.innerText || '';
-      
-      // 清理多餘空白
-      return text.trim();
-    }
-    
-    // 嘗試從多個可能的欄位名稱取得D2資料
-    function extractPosition(data) {
-      const possibleKeys = ['position', 'd2', 'd2Value', 'location', 'htmlD2', 'htmlContentD2', 'sheetD2'];
-      
-      for (const key of possibleKeys) {
-        if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
-          console.log(`找到D2資料於欄位 "${key}":`, data[key]);
-          return cleanHtmlContent(data[key]);
-        }
-      }
-      
-      // 如果都沒有，檢查是否有bookInfo.location或其他相關欄位
-      if (data.bookInfo) {
-        const bookInfoKeys = ['location', 'position', 'place', 'd2'];
-        for (const key of bookInfoKeys) {
-          if (data.bookInfo[key]) {
-            console.log(`找到D2資料於 bookInfo.${key}:`, data.bookInfo[key]);
-            return cleanHtmlContent(data.bookInfo[key]);
-          }
-        }
-      }
-      
-      console.warn('未找到D2資料，可用欄位:', Object.keys(data));
-      return '';
     }
     
     async function submitQuery() {
@@ -1322,79 +931,43 @@
       
       inputBox.classList.remove('error');
       errorHint.classList.remove('show');
-      
       btn.classList.add('loading');
       btn.textContent = '執行中...';
-      
       showStatus('', '', true);
       
       try {
-        console.log('發送請求:', `${GAS_API_URL}?action=query&input=${encodeURIComponent(inputValue)}`);
+        const response = await fetchWithTimeout(`${GAS_API_URL}?action=query&input=${encodeURIComponent(inputValue)}`, {}, 30000);
         
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=query&input=${encodeURIComponent(inputValue)}`,
-          {},
-          30000
-        );
-        
-        console.log('響應狀態:', response.status);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const text = await response.text();
-        console.log('原始響應:', text.substring(0, 1000));
+        console.log('回應:', text.substring(0, 500));
         
         let data;
         try {
           data = JSON.parse(text);
         } catch (e) {
-          console.error('JSON 解析錯誤:', e);
-          throw new Error('伺服器返回格式錯誤');
+          throw new Error('JSON解析錯誤');
         }
-        
-        // 除錯：印出所有回傳欄位
-        console.log('回傳資料結構:', data);
-        console.log('回傳欄位列表:', Object.keys(data));
         
         document.getElementById('searchResults').style.display = 'block';
         
         if (data.success) {
-          if (data.a1Value && data.a1Value.toString().includes('找不到相應值')) {
+          if (data.a1Value && data.a1Value.toString().includes('找不到')) {
             showNotFound(data.a1Value);
             document.getElementById('addInput').value = '';
-            currentPosition = '';
           } else {
-            // 嘗試取得D2位置資料
-            currentPosition = extractPosition(data);
-            console.log('最終D2位置資料:', currentPosition);
-            
-            displaySearchResults(data, currentPosition);
+            displaySearchResults(data);
             showStatus(`✅ 共 ${data.rowCount} 筆結果`, 'success', true);
             document.getElementById('addInput').value = inputValue;
-            showStatus('✅ 已自動填入14位數字', 'success');
+            showStatus('✅ 已自動填入', 'success');
           }
         } else {
           showStatus('❌ ' + (data.error || '未知錯誤'), 'error', true);
-          document.getElementById('addInput').value = '';
-          currentPosition = '';
         }
       } catch (error) {
-        console.error('請求錯誤:', error);
-        let errorMsg = '連線錯誤';
-        
-        if (error.name === 'AbortError') {
-          errorMsg = '請求超時，請檢查網路連線';
-        } else if (error.message.includes('Failed to fetch')) {
-          errorMsg = '無法連接伺服器，請確認網路正常';
-        } else {
-          errorMsg = error.message;
-        }
-        
-        showStatus('❌ ' + errorMsg, 'error', true);
-        document.getElementById('addInput').value = '';
-        currentPosition = '';
+        console.error('錯誤:', error);
+        showStatus('❌ ' + error.message, 'error', true);
       } finally {
         btn.classList.remove('loading');
         btn.textContent = '送出查詢';
@@ -1403,23 +976,30 @@
     }
     
     function showNotFound(a1Value) {
-      const notFoundHtml = '<div class="not-found">❌ 找不到相應值</div>';
-      document.getElementById('libraryCountBox').innerHTML = notFoundHtml;
-      document.getElementById('bookInfoBox').innerHTML = notFoundHtml;
-      document.getElementById('librariesBox').innerHTML = notFoundHtml;
+      const html = '<div class="not-found">❌ 找不到相應值</div>';
+      document.getElementById('libraryCountBox').innerHTML = html;
+      document.getElementById('bookInfoBox').innerHTML = html;
+      document.getElementById('librariesBox').innerHTML = html;
       showStatus('❌ ' + a1Value, 'error', true);
     }
     
-    function displaySearchResults(data, position) {
+    function displaySearchResults(data) {
       const bookInfo = data.bookInfo || {};
       const libraries = data.libraries || [];
       const libraryCount = data.libraryCount || 0;
       
-      // 如果position為空，顯示"未設定"
-      const displayPosition = position || '';
-      const isEmpty = !displayPosition;
+      // 取得位置資料（優先使用 position，其次是 d2）
+      let position = '';
+      if (data.position !== undefined && data.position !== null && data.position !== '') {
+        position = cleanHtmlContent(data.position);
+      } else if (data.d2 !== undefined && data.d2 !== null && data.d2 !== '') {
+        position = cleanHtmlContent(data.d2);
+      }
       
-      // 修改：顯示可選項目數量與位置 (D2)
+      console.log('位置資料:', position);
+      
+      const isEmpty = !position;
+      
       document.getElementById('libraryCountBox').innerHTML = `
         <div class="location-display">
           <div class="location-count-section">
@@ -1428,8 +1008,8 @@
           </div>
           <div class="location-position-section">
             <div class="location-label">位置 (D2)</div>
-            <div class="location-value ${isEmpty ? 'empty' : ''}">${isEmpty ? '未設定' : displayPosition}</div>
-            ${isEmpty ? '<div class="debug-info">請確認GAS回傳欄位包含D2資料</div>' : ''}
+            <div class="location-value ${isEmpty ? 'empty' : ''}">${isEmpty ? '未設定' : position}</div>
+            ${isEmpty ? '<div class="debug-info">請確認 RawData C欄有資料</div>' : ''}
           </div>
         </div>
       `;
@@ -1484,42 +1064,25 @@
       }
     }
     
-    //========== Manual Select 功能（右側） ==========
-    
     function updateDisplay() {
       const display = document.getElementById('manualSelectDisplay');
       display.value = manualSelectData.length > 0 ? manualSelectData.join('\n') : '(無資料)';
-      display.classList.add('updating');
-      setTimeout(() => display.classList.remove('updating'), 300);
     }
     
     async function loadManualSelect() {
       try {
-        console.log('載入 ManualSelect...');
         const response = await fetchWithTimeout(`${GAS_API_URL}?action=getManualSelect`, {}, 10000);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
+        if (!response.ok) return;
         
         const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error('JSON解析錯誤');
-        }
+        const data = JSON.parse(text);
         
         if (data.success) {
           manualSelectData = data.data || [];
           updateDisplay();
-          console.log('載入成功:', manualSelectData.length, '筆資料');
-        } else {
-          showStatus('載入失敗：' + (data.error || '未知錯誤'), 'error');
         }
       } catch (error) {
         console.error('載入錯誤:', error);
-        showStatus('載入錯誤：' + error.message, 'error');
       }
     }
     
@@ -1545,26 +1108,15 @@
       btn.disabled = true;
       
       try {
-        const response = await fetchWithTimeout(
-          `${GAS_API_URL}?action=addToManualSelect&value=${encodeURIComponent(value)}`,
-          {},
-          30000
-        );
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const response = await fetchWithTimeout(`${GAS_API_URL}?action=addToManualSelect&value=${encodeURIComponent(value)}`, {}, 30000);
+        const data = await response.json();
         
         if (data.success) {
           showStatus('✅ 同步完成', 'success');
         } else {
-          throw new Error(data.error || '同步失敗');
+          throw new Error(data.error);
         }
       } catch (error) {
-        console.error('新增錯誤:', error);
         manualSelectData.pop();
         updateDisplay();
         input.value = value;
@@ -1575,7 +1127,7 @@
     }
     
     async function clearAll() {
-      if (!confirm('確定要清除 A 欄所有資料嗎？此動作無法復原。')) return;
+      if (!confirm('確定要清除 A 欄所有資料嗎？')) return;
       
       const originalData = [...manualSelectData];
       manualSelectData = [];
@@ -1584,21 +1136,14 @@
       
       try {
         const response = await fetchWithTimeout(`${GAS_API_URL}?action=clearManualSelect`, {}, 30000);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const data = await response.json();
         
         if (data.success) {
           showStatus('✅ 同步完成', 'success');
         } else {
-          throw new Error(data.error || '清除失敗');
+          throw new Error(data.error);
         }
       } catch (error) {
-        console.error('清除錯誤:', error);
         manualSelectData = originalData;
         updateDisplay();
         showStatus('❌ ' + error.message, 'error');
@@ -1618,21 +1163,14 @@
       
       try {
         const response = await fetchWithTimeout(`${GAS_API_URL}?action=removeLastManualSelect`, {}, 30000);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const data = await response.json();
         
         if (data.success) {
           showStatus('✅ 同步完成', 'success');
         } else {
-          throw new Error(data.error || '移除失敗');
+          throw new Error(data.error);
         }
       } catch (error) {
-        console.error('移除錯誤:', error);
         manualSelectData = originalData;
         updateDisplay();
         showStatus('❌ ' + error.message, 'error');
@@ -1640,59 +1178,25 @@
     }
     
     async function exportToTxt() {
-      try {
-        if (manualSelectData.length === 0) {
-          showStatus('無資料可匯出', 'error');
-          return;
-        }
-        
-        const content = manualSelectData.join('\n');
-        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `ManualSelect_${new Date().toISOString().slice(0,10)}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showStatus('✅ 已匯出 TXT', 'success');
-      } catch (error) {
-        console.error('匯出錯誤:', error);
-        showStatus('❌ 匯出失敗：' + error.message, 'error');
+      if (manualSelectData.length === 0) {
+        showStatus('無資料可匯出', 'error');
+        return;
       }
+      
+      const content = manualSelectData.join('\n');
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ManualSelect_${new Date().toISOString().slice(0,10)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showStatus('✅ 已匯出 TXT', 'success');
     }
-    
-    // 定期同步
-    let syncInterval;
-    function startSync() {
-      syncInterval = setInterval(() => {
-        if (!document.hidden) {
-          loadManualSelect();
-        }
-      }, 30000);
-    }
-    
-    function stopSync() {
-      if (syncInterval) clearInterval(syncInterval);
-    }
-    
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        stopSync();
-      } else {
-        loadManualSelect();
-        startSync();
-      }
-    });
-    
-    startSync();
-    
-    window.addEventListener('focus', () => {
-      loadManualSelect();
-    });
     
     document.getElementById('inputBox').addEventListener('input', function() {
       const value = this.value.replace(/\D/g, '');
@@ -1704,28 +1208,15 @@
       if (e.key === 'Enter') submitQuery();
     });
     
-    // 模態框輸入框限制數字
     document.getElementById('displayColumnInput').addEventListener('input', function() {
-      // 移除非數字字符
       const value = this.value.replace(/\D/g, '');
       if (this.value !== value) this.value = value;
-      
-      // 限制長度3位（0-999）
       if (this.value.length > 3) this.value = this.value.substring(0, 3);
     });
     
-    // 模態框支援Enter鍵儲存
     document.getElementById('displayColumnInput').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        saveDisplayColumnFromModal();
-      }
+      if (e.key === 'Enter') saveDisplayColumnFromModal();
     });
-    
-    if (window.location.search.includes('debug=true')) {
-      window.onerror = function(msg, url, line) {
-        alert('錯誤: ' + msg + '\n行號: ' + line);
-      };
-    }
   </script>
 </body>
 </html>
