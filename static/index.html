@@ -29,6 +29,7 @@
       z-index: 200;
       display: flex;
       gap: 10px;
+      flex-wrap: wrap;
     }
     
     .icon-btn {
@@ -206,6 +207,12 @@
       border-color: #f44336;
       background: #ffebee;
       color: #c62828;
+    }
+    
+    .modal-log.info {
+      border-color: #2196f3;
+      background: #e3f2fd;
+      color: #1565c0;
     }
     
     .modal-buttons {
@@ -685,7 +692,7 @@
     
     @media screen and (max-width: 768px) {
       body { overflow: auto; height: auto; }
-      .top-left-controls { top: 10px; left: 10px; }
+      .top-left-controls { top: 10px; left: 10px; max-width: calc(100% - 80px); }
       .icon-btn { width: 40px; height: 40px; font-size: 18px; }
       .container { flex-direction: column; height: auto; min-height: 100vh; }
       .left-panel { width: 100%; padding: 20px; padding-top: 70px; overflow-y: visible; }
@@ -752,7 +759,7 @@
       
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeSingleUpdateModal()">取消</button>
-        <button class="modal-btn modal-btn-primary" onclick="submitSingleUpdate()">更新</button>
+        <button class="modal-btn modal-btn-primary" onclick="submitSingleUpdate()" id="singleUpdateBtn">更新</button>
       </div>
     </div>
   </div>
@@ -775,7 +782,7 @@
       
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeBatchUpdateModal()">取消</button>
-        <button class="modal-btn modal-btn-primary" onclick="submitBatchUpdate()">更新(批量)</button>
+        <button class="modal-btn modal-btn-primary" onclick="submitBatchUpdate()" id="batchUpdateBtn">更新(批量)</button>
       </div>
     </div>
   </div>
@@ -1022,6 +1029,7 @@
       const barcodeInput = document.getElementById('singleBarcodeInput');
       const errorDiv = document.getElementById('singleUpdateError');
       const logDiv = document.getElementById('singleUpdateLog');
+      const btn = document.getElementById('singleUpdateBtn');
       const location = locationInput.value.trim();
       const barcode = barcodeInput.value.trim();
       
@@ -1041,9 +1049,13 @@
       errorDiv.textContent = '';
       logDiv.style.display = 'block';
       logDiv.textContent = '⏳ 執行中...';
-      logDiv.className = 'modal-log';
+      logDiv.className = 'modal-log info';
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.textContent = '更新中...';
       
       try {
+        // 使用 GET 方法傳送資料
         const url = `${GAS_API_URL}?action=processAddNewAddress&location=${encodeURIComponent(location)}&barcode=${encodeURIComponent(barcode)}`;
         console.log('單一更新 URL:', url);
         
@@ -1058,24 +1070,36 @@
         try {
           data = JSON.parse(text);
         } catch (e) {
-          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
+          throw new Error('伺服器回應格式錯誤: ' + text.substring(0, 100));
         }
         
         if (data.success) {
-          logDiv.textContent = `✅ 更新成功\n\n${data.message || ''}`;
+          logDiv.textContent = `✅ 更新成功\n\n位置：${location}\n條碼：${barcode}\n\n${data.message || ''}`;
           logDiv.className = 'modal-log success';
+          
+          // 清空條碼輸入框，方便下一筆
+          barcodeInput.value = '';
+          barcodeInput.focus();
           
           // 3秒後自動關閉
           setTimeout(() => {
             closeSingleUpdateModal();
           }, 3000);
         } else {
-          throw new Error(data.error || '更新失敗');
+          throw new Error(data.error || '更新失敗，請檢查GAS後端是否已添加 processAddNewAddress 處理');
         }
       } catch (error) {
         console.error('單一更新錯誤:', error);
-        logDiv.textContent = `❌ 錯誤：${error.message}`;
+        let errorMsg = error.message;
+        if (errorMsg.includes('未知的 action')) {
+          errorMsg += '\n\n⚠️ 請確認GAS後端已添加：\ncase "processAddNewAddress":\n  // 處理單一更新邏輯';
+        }
+        logDiv.textContent = `❌ 錯誤：${errorMsg}`;
         logDiv.className = 'modal-log error';
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.textContent = '更新';
       }
     }
     
@@ -1124,6 +1148,7 @@
       const barcodeInput = document.getElementById('batchBarcodeInput');
       const errorDiv = document.getElementById('batchUpdateError');
       const logDiv = document.getElementById('batchUpdateLog');
+      const btn = document.getElementById('batchUpdateBtn');
       const location = locationInput.value.trim();
       const barcodeText = barcodeInput.value.trim();
       
@@ -1147,62 +1172,130 @@
         return;
       }
       
+      // 檢查數量，若超過50筆，分批處理
+      const BATCH_SIZE = 50;
+      if (barcodes.length > BATCH_SIZE) {
+        if (!confirm(`偵測到 ${barcodes.length} 筆條碼，建議分批處理以避免超時。\n\n是否自動分批處理（每批${BATCH_SIZE}筆）？`)) {
+          return;
+        }
+      }
+      
       errorDiv.textContent = '';
       logDiv.style.display = 'block';
-      logDiv.textContent = `⏳ 處理中... 找到 ${barcodes.length} 筆有效條碼`;
-      logDiv.className = 'modal-log';
+      logDiv.textContent = `⏳ 準備處理 ${barcodes.length} 筆資料...`;
+      logDiv.className = 'modal-log info';
+      btn.disabled = true;
+      btn.classList.add('loading');
+      btn.textContent = '處理中...';
       
       try {
-        // 由於資料量可能較大，使用 POST 方式發送
-        const payload = {
-          action: 'processBigDataAddNewAddressFixed',
-          location: location,
-          barcodes: barcodes
-        };
+        // 將陣列轉為逗號分隔字串，使用 GET 方法傳送
+        const barcodesStr = barcodes.join(',');
         
-        console.log('批量更新:', payload);
+        // 檢查 URL 長度，若太長則分批
+        const testUrl = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(barcodesStr)}`;
         
-        const response = await fetchWithTimeout(
-          GAS_API_URL, 
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-          }, 
-          60000 // 批量操作給較長超時時間
-        );
-        
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        
-        const text = await response.text();
-        console.log('批量更新回應:', text);
-        
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch (e) {
-          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
-        }
-        
-        if (data.success) {
-          logDiv.textContent = `✅ 批量更新成功\n處理筆數：${barcodes.length}\n位置：${location}\n\n${data.message || ''}`;
-          logDiv.className = 'modal-log success';
-          
-          // 清空輸入
-          barcodeInput.value = '';
-          
-          // 5秒後自動關閉
-          setTimeout(() => {
-            closeBatchUpdateModal();
-          }, 5000);
+        if (testUrl.length > 1800) {
+          // URL 太長，使用分批策略
+          logDiv.textContent += `\n資料量較大，自動分批處理...`;
+          await processBatchInChunks(location, barcodes, logDiv, btn);
         } else {
-          throw new Error(data.error || '批量更新失敗');
+          // 單次傳送
+          await sendBatchUpdate(location, barcodesStr, barcodes.length, logDiv);
         }
+        
       } catch (error) {
         console.error('批量更新錯誤:', error);
-        logDiv.textContent = `❌ 錯誤：${error.message}\n\n已處理 ${barcodes.length} 筆條碼，但更新失敗`;
+        logDiv.textContent += `\n\n❌ 錯誤：${error.message}`;
+        logDiv.className = 'modal-log error';
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.textContent = '更新(批量)';
+      }
+    }
+    
+    async function sendBatchUpdate(location, barcodesStr, count, logDiv) {
+      const url = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(barcodesStr)}`;
+      
+      console.log('批量更新 URL 長度:', url.length);
+      logDiv.textContent += `\n發送請求（${count}筆）...`;
+      
+      const response = await fetchWithTimeout(url, {}, 60000);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+      }
+      
+      const text = await response.text();
+      console.log('批量更新回應:', text);
+      
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        throw new Error('伺服器回應格式錯誤: ' + text.substring(0, 100));
+      }
+      
+      if (data.success) {
+        logDiv.textContent += `\n✅ 成功`;
+        logDiv.className = 'modal-log success';
+        
+        setTimeout(() => {
+          closeBatchUpdateModal();
+        }, 2000);
+      } else {
+        throw new Error(data.error || '批量更新失敗');
+      }
+    }
+    
+    async function processBatchInChunks(location, barcodes, logDiv, btn) {
+      const BATCH_SIZE = 30; // 每批30筆，確保URL不會過長
+      const totalBatches = Math.ceil(barcodes.length / BATCH_SIZE);
+      let successCount = 0;
+      let errorMessages = [];
+      
+      for (let i = 0; i < totalBatches; i++) {
+        const batch = barcodes.slice(i * BATCH_SIZE, (i + 1) * BATCH_SIZE);
+        const batchStr = batch.join(',');
+        
+        logDiv.textContent += `\n處理第 ${i + 1}/${totalBatches} 批（${batch.length}筆）...`;
+        
+        try {
+          const url = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(batchStr)}`;
+          const response = await fetchWithTimeout(url, {}, 60000);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          
+          const text = await response.text();
+          const data = JSON.parse(text);
+          
+          if (data.success) {
+            successCount += batch.length;
+            logDiv.textContent += ` ✅`;
+          } else {
+            throw new Error(data.error || '批次失敗');
+          }
+        } catch (error) {
+          logDiv.textContent += ` ❌`;
+          errorMessages.push(`第${i+1}批: ${error.message}`);
+        }
+        
+        // 短暫延遲，避免請求過快
+        if (i < totalBatches - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      if (errorMessages.length === 0) {
+        logDiv.textContent += `\n\n✅ 全部完成！共處理 ${successCount} 筆資料`;
+        logDiv.className = 'modal-log success';
+        setTimeout(() => closeBatchUpdateModal(), 3000);
+      } else {
+        logDiv.textContent += `\n\n⚠️ 完成但有錯誤：\n成功：${successCount} 筆\n失敗：${errorMessages.length} 批\n\n${errorMessages.join('\n')}`;
         logDiv.className = 'modal-log error';
       }
     }
