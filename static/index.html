@@ -760,6 +760,12 @@
       }
     });
     
+    // ⏱️ 格式化時間顯示
+    function formatDuration(ms) {
+      if (ms < 1000) return `${Math.round(ms)}ms`;
+      return `${(ms / 1000).toFixed(2)}s`;
+    }
+    
     function openDisplayColumnModal() {
       const modal = document.getElementById('displayColumnModal');
       const input = document.getElementById('displayColumnInput');
@@ -935,6 +941,11 @@
       btn.textContent = '執行中...';
       showStatus('', '', true);
       
+      // ⏱️ 開始計時
+      const startTime = performance.now();
+      let duration = 0;
+      let statusMsg = '';
+      
       try {
         const response = await fetchWithTimeout(`${GAS_API_URL}?action=query&input=${encodeURIComponent(inputValue)}`, {}, 30000);
         
@@ -956,19 +967,33 @@
           if (data.a1Value && data.a1Value.toString().includes('找不到')) {
             showNotFound(data.a1Value);
             document.getElementById('addInput').value = '';
+            statusMsg = '❌ ' + data.a1Value;
           } else {
             displaySearchResults(data);
-            showStatus(`✅ 共 ${data.rowCount} 筆結果`, 'success', true);
+            statusMsg = `✅ 共 ${data.rowCount} 筆結果`;
+            showStatus(statusMsg, 'success', true);
             document.getElementById('addInput').value = inputValue;
             showStatus('✅ 已自動填入', 'success');
           }
         } else {
-          showStatus('❌ ' + (data.error || '未知錯誤'), 'error', true);
+          statusMsg = '❌ ' + (data.error || '未知錯誤');
+          showStatus(statusMsg, 'error', true);
         }
       } catch (error) {
         console.error('錯誤:', error);
-        showStatus('❌ ' + error.message, 'error', true);
+        statusMsg = '❌ ' + error.message;
+        showStatus(statusMsg, 'error', true);
       } finally {
+        // ⏱️ 結束計時並顯示
+        duration = performance.now() - startTime;
+        const durationStr = formatDuration(duration);
+        
+        // 更新狀態訊息，附加執行時間
+        if (statusMsg) {
+          const finalMsg = `${statusMsg} (⏱️ ${durationStr})`;
+          document.getElementById('searchStatus').textContent = finalMsg;
+        }
+        
         btn.classList.remove('loading');
         btn.textContent = '送出查詢';
         inputBox.value = '';
