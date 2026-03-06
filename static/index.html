@@ -80,6 +80,12 @@
       max-width: 400px;
       box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       animation: modalSlideIn 0.3s ease-out;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-content.large {
+      max-width: 600px;
     }
     
     @keyframes modalSlideIn {
@@ -129,6 +135,41 @@
       background: #ffebee;
     }
     
+    .modal-textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+      background: #f8f9fa;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+      min-height: 120px;
+    }
+    
+    .modal-textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+    
+    .modal-textarea.error {
+      border-color: #f44336;
+      background: #ffebee;
+    }
+    
+    .modal-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 600;
+      font-size: 14px;
+      margin-top: 15px;
+    }
+    
     .modal-error {
       color: #f44336;
       font-size: 13px;
@@ -138,9 +179,39 @@
       font-weight: 600;
     }
     
+    .modal-log {
+      width: 100%;
+      min-height: 80px;
+      max-height: 150px;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      background: #f5f5f5;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #333;
+      overflow-y: auto;
+      margin-top: 15px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
+    .modal-log.success {
+      border-color: #4caf50;
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+    
+    .modal-log.error {
+      border-color: #f44336;
+      background: #ffebee;
+      color: #c62828;
+    }
+    
     .modal-buttons {
       display: flex;
       gap: 10px;
+      margin-top: 20px;
     }
     
     .modal-btn {
@@ -645,8 +716,11 @@
 <body>
   <div class="top-left-controls">
     <button class="icon-btn" onclick="openDisplayColumnModal()" title="設定顯示圖書館數量 (F1)">⚙️</button>
+    <button class="icon-btn" onclick="openSingleUpdateModal()" title="單一更新圖書位置">📝</button>
+    <button class="icon-btn" onclick="openBatchUpdateModal()" title="批量更新圖書位置">📑</button>
   </div>
   
+  <!-- 設定顯示圖書館數量 Modal -->
   <div class="modal-overlay" id="displayColumnModal" onclick="closeDisplayColumnModal(event)">
     <div class="modal-content" onclick="event.stopPropagation()">
       <div class="modal-header">請輸入顯示圖書館的數量</div>
@@ -656,6 +730,52 @@
       <div class="modal-buttons">
         <button class="modal-btn modal-btn-secondary" onclick="closeDisplayColumnModal()">取消</button>
         <button class="modal-btn modal-btn-primary" onclick="saveDisplayColumnFromModal()">儲存</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 單一更新圖書位置 Modal -->
+  <div class="modal-overlay" id="singleUpdateModal" onclick="closeSingleUpdateModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">請輸入書目條碼</div>
+      <div class="modal-subtitle">更新單一書目位置資訊</div>
+      
+      <label class="modal-label">請輸入書目位置</label>
+      <input type="text" id="singleLocationInput" class="modal-input" placeholder="輸入位置..." maxlength="100">
+      
+      <label class="modal-label">請輸入書目條碼（14位純數字）</label>
+      <input type="text" id="singleBarcodeInput" class="modal-input" placeholder="請輸入14位純數字..." inputmode="numeric" pattern="[0-9]*" maxlength="14">
+      
+      <div class="modal-error" id="singleUpdateError"></div>
+      
+      <div class="modal-log" id="singleUpdateLog" style="display: none;"></div>
+      
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="closeSingleUpdateModal()">取消</button>
+        <button class="modal-btn modal-btn-primary" onclick="submitSingleUpdate()">更新</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 批量更新圖書位置 Modal -->
+  <div class="modal-overlay" id="batchUpdateModal" onclick="closeBatchUpdateModal(event)">
+    <div class="modal-content large" onclick="event.stopPropagation()">
+      <div class="modal-header">請輸入全部書目條碼</div>
+      <div class="modal-subtitle">批量更新書目位置資訊</div>
+      
+      <label class="modal-label">請輸入書目位置(批量)</label>
+      <input type="text" id="batchLocationInput" class="modal-input" placeholder="輸入位置..." maxlength="100">
+      
+      <label class="modal-label">請輸入書目條碼(批量)（每行一筆，自動取前14位數字）</label>
+      <textarea id="batchBarcodeInput" class="modal-textarea" placeholder="請輸入條碼，每行一筆...&#10;例如：&#10;12345678901234&#10;56789012345678"></textarea>
+      
+      <div class="modal-error" id="batchUpdateError"></div>
+      
+      <div class="modal-log" id="batchUpdateLog" style="display: none;"></div>
+      
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-secondary" onclick="closeBatchUpdateModal()">取消</button>
+        <button class="modal-btn modal-btn-primary" onclick="submitBatchUpdate()">更新(批量)</button>
       </div>
     </div>
   </div>
@@ -766,6 +886,7 @@
       return `${(ms / 1000).toFixed(2)}s`;
     }
     
+    // ==================== 顯示圖書館數量設定 ====================
     function openDisplayColumnModal() {
       const modal = document.getElementById('displayColumnModal');
       const input = document.getElementById('displayColumnInput');
@@ -783,12 +904,19 @@
       document.getElementById('displayColumnModal').classList.remove('show');
     }
     
-    function showModalError(msg) {
-      const errorDiv = document.getElementById('modalError');
-      const input = document.getElementById('displayColumnInput');
+    function showModalError(msg, modalType = 'display') {
+      const errorDiv = modalType === 'display' ? document.getElementById('modalError') : 
+                      modalType === 'single' ? document.getElementById('singleUpdateError') : 
+                      document.getElementById('batchUpdateError');
+      const input = modalType === 'display' ? document.getElementById('displayColumnInput') : 
+                   modalType === 'single' ? document.getElementById('singleBarcodeInput') : 
+                   document.getElementById('batchBarcodeInput');
+      
       errorDiv.textContent = msg;
-      input.classList.add('error');
-      setTimeout(() => input.classList.remove('error'), 3000);
+      if (input) input.classList.add('error');
+      setTimeout(() => {
+        if (input) input.classList.remove('error');
+      }, 3000);
     }
     
     async function saveDisplayColumnFromModal() {
@@ -798,12 +926,12 @@
       // 驗證：必須為空白或0-999
       if (newValue !== '') {
         if (!/^\d+$/.test(newValue)) {
-          showModalError('請輸入純數字（0-999）或留空');
+          showModalError('請輸入純數字（0-999）或留空', 'display');
           return;
         }
         const numValue = parseInt(newValue, 10);
         if (numValue < 0 || numValue > 999) {
-          showModalError('數字必須在 0-999 範圍內');
+          showModalError('數字必須在 0-999 範圍內', 'display');
           return;
         }
       }
@@ -838,7 +966,7 @@
         }
       } catch (error) {
         console.error('儲存錯誤:', error);
-        showModalError('儲存失敗: ' + error.message);
+        showModalError('儲存失敗: ' + error.message, 'display');
         showStatus('❌ 儲存失敗', 'error', true);
       }
     }
@@ -860,6 +988,226 @@
       }
     }
     
+    // ==================== 單一更新圖書位置 ====================
+    function openSingleUpdateModal() {
+      const modal = document.getElementById('singleUpdateModal');
+      const locationInput = document.getElementById('singleLocationInput');
+      const barcodeInput = document.getElementById('singleBarcodeInput');
+      const errorDiv = document.getElementById('singleUpdateError');
+      const logDiv = document.getElementById('singleUpdateLog');
+      
+      // 重置表單
+      locationInput.value = '';
+      barcodeInput.value = '';
+      errorDiv.textContent = '';
+      logDiv.style.display = 'none';
+      logDiv.textContent = '';
+      logDiv.className = 'modal-log';
+      
+      modal.classList.add('show');
+      locationInput.focus();
+    }
+    
+    function closeSingleUpdateModal(event) {
+      if (event && event.target !== document.getElementById('singleUpdateModal')) return;
+      document.getElementById('singleUpdateModal').classList.remove('show');
+    }
+    
+    function validateBarcode14(value) {
+      return /^\d{14}$/.test(value);
+    }
+    
+    async function submitSingleUpdate() {
+      const locationInput = document.getElementById('singleLocationInput');
+      const barcodeInput = document.getElementById('singleBarcodeInput');
+      const errorDiv = document.getElementById('singleUpdateError');
+      const logDiv = document.getElementById('singleUpdateLog');
+      const location = locationInput.value.trim();
+      const barcode = barcodeInput.value.trim();
+      
+      // 驗證
+      if (!location) {
+        showModalError('請輸入書目位置', 'single');
+        locationInput.focus();
+        return;
+      }
+      
+      if (!validateBarcode14(barcode)) {
+        showModalError('條碼必須為14位純數字', 'single');
+        barcodeInput.focus();
+        return;
+      }
+      
+      errorDiv.textContent = '';
+      logDiv.style.display = 'block';
+      logDiv.textContent = '⏳ 執行中...';
+      logDiv.className = 'modal-log';
+      
+      try {
+        const url = `${GAS_API_URL}?action=processAddNewAddress&location=${encodeURIComponent(location)}&barcode=${encodeURIComponent(barcode)}`;
+        console.log('單一更新 URL:', url);
+        
+        const response = await fetchWithTimeout(url, {}, 30000);
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const text = await response.text();
+        console.log('單一更新回應:', text);
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
+        }
+        
+        if (data.success) {
+          logDiv.textContent = `✅ 更新成功\n\n${data.message || ''}`;
+          logDiv.className = 'modal-log success';
+          
+          // 3秒後自動關閉
+          setTimeout(() => {
+            closeSingleUpdateModal();
+          }, 3000);
+        } else {
+          throw new Error(data.error || '更新失敗');
+        }
+      } catch (error) {
+        console.error('單一更新錯誤:', error);
+        logDiv.textContent = `❌ 錯誤：${error.message}`;
+        logDiv.className = 'modal-log error';
+      }
+    }
+    
+    // ==================== 批量更新圖書位置 ====================
+    function openBatchUpdateModal() {
+      const modal = document.getElementById('batchUpdateModal');
+      const locationInput = document.getElementById('batchLocationInput');
+      const barcodeInput = document.getElementById('batchBarcodeInput');
+      const errorDiv = document.getElementById('batchUpdateError');
+      const logDiv = document.getElementById('batchUpdateLog');
+      
+      // 重置表單
+      locationInput.value = '';
+      barcodeInput.value = '';
+      errorDiv.textContent = '';
+      logDiv.style.display = 'none';
+      logDiv.textContent = '';
+      logDiv.className = 'modal-log';
+      
+      modal.classList.add('show');
+      locationInput.focus();
+    }
+    
+    function closeBatchUpdateModal(event) {
+      if (event && event.target !== document.getElementById('batchUpdateModal')) return;
+      document.getElementById('batchUpdateModal').classList.remove('show');
+    }
+    
+    function processBatchBarcodes(text) {
+      const lines = text.split('\n');
+      const validBarcodes = [];
+      
+      lines.forEach(line => {
+        // 取前14個字符，並過濾非數字
+        let processed = line.trim().substring(0, 14).replace(/\D/g, '');
+        if (processed.length === 14) {
+          validBarcodes.push(processed);
+        }
+      });
+      
+      return validBarcodes;
+    }
+    
+    async function submitBatchUpdate() {
+      const locationInput = document.getElementById('batchLocationInput');
+      const barcodeInput = document.getElementById('batchBarcodeInput');
+      const errorDiv = document.getElementById('batchUpdateError');
+      const logDiv = document.getElementById('batchUpdateLog');
+      const location = locationInput.value.trim();
+      const barcodeText = barcodeInput.value.trim();
+      
+      // 驗證
+      if (!location) {
+        showModalError('請輸入書目位置', 'batch');
+        locationInput.focus();
+        return;
+      }
+      
+      if (!barcodeText) {
+        showModalError('請輸入書目條碼', 'batch');
+        barcodeInput.focus();
+        return;
+      }
+      
+      const barcodes = processBatchBarcodes(barcodeText);
+      
+      if (barcodes.length === 0) {
+        showModalError('未找到有效的14位數字條碼', 'batch');
+        return;
+      }
+      
+      errorDiv.textContent = '';
+      logDiv.style.display = 'block';
+      logDiv.textContent = `⏳ 處理中... 找到 ${barcodes.length} 筆有效條碼`;
+      logDiv.className = 'modal-log';
+      
+      try {
+        // 由於資料量可能較大，使用 POST 方式發送
+        const payload = {
+          action: 'processBigDataAddNewAddressFixed',
+          location: location,
+          barcodes: barcodes
+        };
+        
+        console.log('批量更新:', payload);
+        
+        const response = await fetchWithTimeout(
+          GAS_API_URL, 
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+          }, 
+          60000 // 批量操作給較長超時時間
+        );
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const text = await response.text();
+        console.log('批量更新回應:', text);
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
+        }
+        
+        if (data.success) {
+          logDiv.textContent = `✅ 批量更新成功\n處理筆數：${barcodes.length}\n位置：${location}\n\n${data.message || ''}`;
+          logDiv.className = 'modal-log success';
+          
+          // 清空輸入
+          barcodeInput.value = '';
+          
+          // 5秒後自動關閉
+          setTimeout(() => {
+            closeBatchUpdateModal();
+          }, 5000);
+        } else {
+          throw new Error(data.error || '批量更新失敗');
+        }
+      } catch (error) {
+        console.error('批量更新錯誤:', error);
+        logDiv.textContent = `❌ 錯誤：${error.message}\n\n已處理 ${barcodes.length} 筆條碼，但更新失敗`;
+        logDiv.className = 'modal-log error';
+      }
+    }
+    
+    // ==================== 原有功能 ====================
     function togglePanel() {
       const panel = document.getElementById('rightPanel');
       const overlay = document.getElementById('overlay');
@@ -1223,6 +1571,7 @@
       showStatus('✅ 已匯出 TXT', 'success');
     }
     
+    // 輸入框事件監聽
     document.getElementById('inputBox').addEventListener('input', function() {
       const value = this.value.replace(/\D/g, '');
       if (this.value !== value) this.value = value;
@@ -1241,6 +1590,35 @@
     
     document.getElementById('displayColumnInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') saveDisplayColumnFromModal();
+    });
+    
+    // 單一更新條碼輸入框限制
+    document.getElementById('singleBarcodeInput').addEventListener('input', function() {
+      const value = this.value.replace(/\D/g, '');
+      if (this.value !== value) this.value = value;
+      if (value.length > 14) this.value = value.substring(0, 14);
+    });
+    
+    document.getElementById('singleBarcodeInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') submitSingleUpdate();
+    });
+    
+    document.getElementById('singleLocationInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('singleBarcodeInput').focus();
+      }
+    });
+    
+    // 批量更新輸入框限制（每行處理）
+    document.getElementById('batchBarcodeInput').addEventListener('input', function() {
+      // 允許多行輸入，但限制每行長度（視覺上）
+      // 實際處理在提交時進行
+    });
+    
+    document.getElementById('batchLocationInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('batchBarcodeInput').focus();
+      }
     });
   </script>
 </body>
