@@ -183,7 +183,7 @@
     .modal-log {
       width: 100%;
       min-height: 80px;
-      max-height: 200px;
+      max-height: 150px;
       padding: 12px;
       border: 2px solid #e0e0e0;
       border-radius: 8px;
@@ -351,7 +351,6 @@
     
     button.loading {
       pointer-events: none;
-      color: transparent;
     }
     
     button.loading::after {
@@ -867,7 +866,7 @@
   <button class="mobile-toggle" id="mobileToggle" onclick="togglePanel()" title="開啟 Manual Select">📋</button>
 
   <script>
-    // ⚠️ 重要：請確認網址正確，且 exec 後面沒有空格！
+    // 【重要】請修改為您新部署的 GAS 網址，確保沒有空格
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbwDczodOap8DVNVEVsXQCNxQI2J_UKZvOsutttSDOD7tTzcWa37Dv_I-SiuwuMi0YAqhg/exec';
     
     let manualSelectData = [];
@@ -888,12 +887,13 @@
       }
     });
     
+    // ⏱️ 格式化時間顯示
     function formatDuration(ms) {
       if (ms < 1000) return `${Math.round(ms)}ms`;
       return `${(ms / 1000).toFixed(2)}s`;
     }
     
-    // ==================== 設定顯示圖書館數量 ====================
+    // ==================== 顯示圖書館數量設定 ====================
     function openDisplayColumnModal() {
       const modal = document.getElementById('displayColumnModal');
       const input = document.getElementById('displayColumnInput');
@@ -915,20 +915,22 @@
       const errorDiv = modalType === 'display' ? document.getElementById('modalError') : 
                       modalType === 'single' ? document.getElementById('singleUpdateError') : 
                       document.getElementById('batchUpdateError');
-      if (errorDiv) errorDiv.textContent = msg;
-    }
-    
-    function clearModalError(modalType) {
-      const errorDiv = modalType === 'display' ? document.getElementById('modalError') : 
-                      modalType === 'single' ? document.getElementById('singleUpdateError') : 
-                      document.getElementById('batchUpdateError');
-      if (errorDiv) errorDiv.textContent = '';
+      const input = modalType === 'display' ? document.getElementById('displayColumnInput') : 
+                   modalType === 'single' ? document.getElementById('singleBarcodeInput') : 
+                   document.getElementById('batchBarcodeInput');
+      
+      errorDiv.textContent = msg;
+      if (input) input.classList.add('error');
+      setTimeout(() => {
+        if (input) input.classList.remove('error');
+      }, 3000);
     }
     
     async function saveDisplayColumnFromModal() {
       const input = document.getElementById('displayColumnInput');
       let newValue = input.value.trim();
       
+      // 驗證：必須為空白或0-999
       if (newValue !== '') {
         if (!/^\d+$/.test(newValue)) {
           showModalError('請輸入純數字（0-999）或留空', 'display');
@@ -942,24 +944,35 @@
       }
       
       try {
+        console.log('儲存 F1:', newValue);
         showStatus('💾 儲存中...', 'info', true);
         
         const url = `${GAS_API_URL}?action=updateDisplayColumn&value=${encodeURIComponent(newValue)}`;
+        console.log('URL:', url);
+        
         const response = await fetchWithTimeout(url, {}, 15000);
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const text = await response.text();
-        let data = JSON.parse(text);
+        console.log('回應:', text);
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤: ' + text.substring(0, 100));
+        }
         
         if (data.success) {
           displayColumnValue = newValue;
           closeDisplayColumnModal();
-          showStatus('✅ 設定已儲存', 'success', true);
+          showStatus('✅ 設定已儲存至 F1', 'success', true);
         } else {
           throw new Error(data.error || '儲存失敗');
         }
       } catch (error) {
+        console.error('儲存錯誤:', error);
         showModalError('儲存失敗: ' + error.message, 'display');
         showStatus('❌ 儲存失敗', 'error', true);
       }
@@ -975,25 +988,28 @@
         
         if (data.success) {
           displayColumnValue = data.value || '';
+          console.log('F1載入:', displayColumnValue);
         }
       } catch (error) {
         console.error('載入F1錯誤:', error);
       }
     }
     
-    // ==================== 單一更新圖書位置 ====================
+    // ==================== 單一更新圖書位置（POST） ====================
     function openSingleUpdateModal() {
       const modal = document.getElementById('singleUpdateModal');
       const locationInput = document.getElementById('singleLocationInput');
       const barcodeInput = document.getElementById('singleBarcodeInput');
+      const errorDiv = document.getElementById('singleUpdateError');
       const logDiv = document.getElementById('singleUpdateLog');
       
+      // 重置表單
       locationInput.value = '';
       barcodeInput.value = '';
+      errorDiv.textContent = '';
       logDiv.style.display = 'none';
       logDiv.textContent = '';
       logDiv.className = 'modal-log';
-      clearModalError('single');
       
       modal.classList.add('show');
       locationInput.focus();
@@ -1008,16 +1024,17 @@
       return /^\d{14}$/.test(value);
     }
     
+    // ✅ 修改：使用 POST 方法
     async function submitSingleUpdate() {
       const locationInput = document.getElementById('singleLocationInput');
       const barcodeInput = document.getElementById('singleBarcodeInput');
+      const errorDiv = document.getElementById('singleUpdateError');
       const logDiv = document.getElementById('singleUpdateLog');
       const btn = document.getElementById('singleUpdateBtn');
       const location = locationInput.value.trim();
       const barcode = barcodeInput.value.trim();
       
-      clearModalError('single');
-      
+      // 驗證
       if (!location) {
         showModalError('請輸入書目位置', 'single');
         locationInput.focus();
@@ -1030,22 +1047,30 @@
         return;
       }
       
+      errorDiv.textContent = '';
       logDiv.style.display = 'block';
       logDiv.textContent = '⏳ 執行中...';
       logDiv.className = 'modal-log info';
       btn.disabled = true;
       btn.classList.add('loading');
+      btn.textContent = '更新中...';
       
       try {
-        // 使用 GET 方法傳送
-        const url = `${GAS_API_URL}?action=processAddNewAddress&location=${encodeURIComponent(location)}&barcode=${encodeURIComponent(barcode)}`;
-        console.log('單一更新 URL:', url);
-        
-        const response = await fetchWithTimeout(url, {}, 30000);
+        // ✅ 使用 POST 方法發送 JSON
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'processAddNewAddress',
+            location: location,
+            barcode: barcode
+          })
+        });
         
         if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+          throw new Error(`HTTP ${response.status}`);
         }
         
         const text = await response.text();
@@ -1055,11 +1080,11 @@
         try {
           data = JSON.parse(text);
         } catch (e) {
-          throw new Error('伺服器回應格式錯誤');
+          throw new Error('伺服器回應格式錯誤: ' + text.substring(0, 100));
         }
         
         if (data.success) {
-          logDiv.textContent = data.message || '✅ 更新成功';
+          logDiv.textContent = `✅ 更新成功\n\n位置：${location}\n條碼：${barcode}\n\n${data.message || ''}`;
           logDiv.className = 'modal-log success';
           
           // 清空條碼輸入框，方便下一筆
@@ -1068,40 +1093,37 @@
           
           // 3秒後自動關閉
           setTimeout(() => {
-            if (document.getElementById('singleUpdateModal').classList.contains('show')) {
-              closeSingleUpdateModal();
-            }
+            closeSingleUpdateModal();
           }, 3000);
         } else {
           throw new Error(data.error || '更新失敗');
         }
       } catch (error) {
         console.error('單一更新錯誤:', error);
-        let errorMsg = error.message;
-        if (errorMsg.includes('未知的 action')) {
-          errorMsg += '\n\n⚠️ 請確認GAS後端已在 doGet 中添加：\ncase "processAddNewAddress":\n  return handleProcessAddNewAddress(...)';
-        }
-        logDiv.textContent = '❌ 錯誤：' + errorMsg;
+        logDiv.textContent = `❌ 錯誤：${error.message}`;
         logDiv.className = 'modal-log error';
       } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
+        btn.textContent = '更新';
       }
     }
     
-    // ==================== 批量更新圖書位置 ====================
+    // ==================== 批量更新圖書位置（POST） ====================
     function openBatchUpdateModal() {
       const modal = document.getElementById('batchUpdateModal');
       const locationInput = document.getElementById('batchLocationInput');
       const barcodeInput = document.getElementById('batchBarcodeInput');
+      const errorDiv = document.getElementById('batchUpdateError');
       const logDiv = document.getElementById('batchUpdateLog');
       
+      // 重置表單
       locationInput.value = '';
       barcodeInput.value = '';
+      errorDiv.textContent = '';
       logDiv.style.display = 'none';
       logDiv.textContent = '';
       logDiv.className = 'modal-log';
-      clearModalError('batch');
       
       modal.classList.add('show');
       locationInput.focus();
@@ -1117,29 +1139,27 @@
       const validBarcodes = [];
       
       lines.forEach(line => {
-        let trimmed = line.trim();
-        if (trimmed) {
-          // 取前14個字符，並過濾非數字
-          let processed = trimmed.substring(0, 14).replace(/\D/g, '');
-          if (processed.length === 14) {
-            validBarcodes.push(processed);
-          }
+        // 取前14個字符，並過濾非數字
+        let processed = line.trim().substring(0, 14).replace(/\D/g, '');
+        if (processed.length === 14) {
+          validBarcodes.push(processed);
         }
       });
       
       return validBarcodes;
     }
     
+    // ✅ 修改：使用 POST 方法
     async function submitBatchUpdate() {
       const locationInput = document.getElementById('batchLocationInput');
       const barcodeInput = document.getElementById('batchBarcodeInput');
+      const errorDiv = document.getElementById('batchUpdateError');
       const logDiv = document.getElementById('batchUpdateLog');
       const btn = document.getElementById('batchUpdateBtn');
       const location = locationInput.value.trim();
       const barcodeText = barcodeInput.value.trim();
       
-      clearModalError('batch');
-      
+      // 驗證
       if (!location) {
         showModalError('請輸入書目位置', 'batch');
         locationInput.focus();
@@ -1159,130 +1179,70 @@
         return;
       }
       
-      // 分批處理提示
-      const BATCH_SIZE = 50;
-      if (barcodes.length > BATCH_SIZE) {
-        if (!confirm(`偵測到 ${barcodes.length} 筆條碼，建議分批處理以避免超時。\n\n是否自動分批處理（每批${BATCH_SIZE}筆）？`)) {
-          return;
-        }
-      }
-      
+      errorDiv.textContent = '';
       logDiv.style.display = 'block';
       logDiv.textContent = `⏳ 準備處理 ${barcodes.length} 筆資料...`;
       logDiv.className = 'modal-log info';
       btn.disabled = true;
       btn.classList.add('loading');
+      btn.textContent = '處理中...';
       
       try {
-        // 檢查 URL 長度，若太長則分批
-        const barcodesStr = barcodes.join(',');
-        const testUrl = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(barcodesStr)}`;
+        // ✅ 使用 POST 方法發送 JSON
+        const response = await fetch(GAS_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            action: 'processBigDataAddNewAddressFixed',
+            location: location,
+            barcodes: barcodes // 傳送陣列，GAS 會解析
+          })
+        });
         
-        if (testUrl.length > 1800 || barcodes.length > BATCH_SIZE) {
-          logDiv.textContent += '\n資料量較大，自動分批處理...';
-          await processBatchInChunks(location, barcodes, logDiv);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+        }
+        
+        const text = await response.text();
+        console.log('批量更新回應:', text);
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('伺服器回應格式錯誤: ' + text.substring(0, 100));
+        }
+        
+        if (data.success) {
+          logDiv.textContent = `✅ ${data.message || '批量更新成功'}`;
+          logDiv.className = 'modal-log success';
+          
+          // 清空輸入
+          barcodeInput.value = '';
+          
+          // 5秒後自動關閉
+          setTimeout(() => {
+            closeBatchUpdateModal();
+          }, 5000);
         } else {
-          await sendBatchUpdate(location, barcodesStr, barcodes.length, logDiv);
+          throw new Error(data.error || '批量更新失敗');
         }
         
       } catch (error) {
         console.error('批量更新錯誤:', error);
-        let errorMsg = error.message;
-        if (errorMsg.includes('未知的 action')) {
-          errorMsg += '\n\n⚠️ 請確認GAS後端已在 doGet 中添加：\ncase "processBigDataAddNewAddressFixed":\n  return handleProcessBigDataAddNewAddressFixed(...)';
-        }
-        logDiv.textContent += '\n\n❌ 錯誤：' + errorMsg;
+        logDiv.textContent = `❌ 錯誤：${error.message}`;
         logDiv.className = 'modal-log error';
       } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
+        btn.textContent = '更新(批量)';
       }
     }
     
-    async function sendBatchUpdate(location, barcodesStr, count, logDiv) {
-      const url = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(barcodesStr)}`;
-      
-      console.log('批量更新 URL 長度:', url.length);
-      logDiv.textContent += `\n發送請求（${count}筆）...`;
-      
-      const response = await fetchWithTimeout(url, {}, 60000);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
-      }
-      
-      const text = await response.text();
-      console.log('批量更新回應:', text);
-      
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        throw new Error('伺服器回應格式錯誤');
-      }
-      
-      if (data.success) {
-        logDiv.textContent += `\n✅ ${data.message || '成功'}`;
-        logDiv.className = 'modal-log success';
-        setTimeout(() => closeBatchUpdateModal(), 2000);
-      } else {
-        throw new Error(data.error || '批量更新失敗');
-      }
-    }
-    
-    async function processBatchInChunks(location, barcodes, logDiv) {
-      const CHUNK_SIZE = 30;
-      const total = barcodes.length;
-      let successTotal = 0;
-      let failedTotal = 0;
-      let errors = [];
-      
-      for (let i = 0; i < total; i += CHUNK_SIZE) {
-        const chunk = barcodes.slice(i, i + CHUNK_SIZE);
-        const chunkNum = Math.floor(i / CHUNK_SIZE) + 1;
-        const totalChunks = Math.ceil(total / CHUNK_SIZE);
-        
-        logDiv.textContent += `\n[${chunkNum}/${totalChunks}] 處理 ${chunk.length} 筆...`;
-        
-        try {
-          const barcodesStr = chunk.join(',');
-          const url = `${GAS_API_URL}?action=processBigDataAddNewAddressFixed&location=${encodeURIComponent(location)}&barcodes=${encodeURIComponent(barcodesStr)}`;
-          
-          const response = await fetchWithTimeout(url, {}, 60000);
-          const text = await response.text();
-          const data = JSON.parse(text);
-          
-          if (data.success) {
-            successTotal += (data.successCount || chunk.length);
-            failedTotal += (data.failedCount || 0);
-            logDiv.textContent += ` ✅`;
-          } else {
-            throw new Error(data.error);
-          }
-        } catch (error) {
-          logDiv.textContent += ` ❌`;
-          errors.push(`第${chunkNum}批: ${error.message}`);
-          failedTotal += chunk.length;
-        }
-        
-        // 短暫延遲，避免請求過快
-        if (i + CHUNK_SIZE < total) {
-          await new Promise(resolve => setTimeout(resolve, 300));
-        }
-      }
-      
-      logDiv.textContent += `\n\n處理完成：成功 ${successTotal} 筆，失敗 ${failedTotal} 筆`;
-      if (errors.length > 0) {
-        logDiv.textContent += '\n\n錯誤詳情：\n' + errors.join('\n');
-        logDiv.className = 'modal-log error';
-      } else {
-        logDiv.className = 'modal-log success';
-        setTimeout(() => closeBatchUpdateModal(), 3000);
-      }
-    }
-    
-    // ==================== 原有功能 ====================
+    // ==================== 原有功能（GET 方法不變） ====================
     function togglePanel() {
       const panel = document.getElementById('rightPanel');
       const overlay = document.getElementById('overlay');
@@ -1361,9 +1321,13 @@
       inputBox.classList.remove('error');
       errorHint.classList.remove('show');
       btn.classList.add('loading');
+      btn.textContent = '執行中...';
       showStatus('', '', true);
       
+      // ⏱️ 開始計時
       const startTime = performance.now();
+      let duration = 0;
+      let statusMsg = '';
       
       try {
         const response = await fetchWithTimeout(`${GAS_API_URL}?action=query&input=${encodeURIComponent(inputValue)}`, {}, 30000);
@@ -1371,7 +1335,14 @@
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
         const text = await response.text();
-        let data = JSON.parse(text);
+        console.log('回應:', text.substring(0, 500));
+        
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('JSON解析錯誤');
+        }
         
         document.getElementById('searchResults').style.display = 'block';
         
@@ -1379,25 +1350,35 @@
           if (data.a1Value && data.a1Value.toString().includes('找不到')) {
             showNotFound(data.a1Value);
             document.getElementById('addInput').value = '';
-            showStatus('❌ ' + data.a1Value, 'error', true);
+            statusMsg = '❌ ' + data.a1Value;
           } else {
             displaySearchResults(data);
+            statusMsg = `✅ 共 ${data.rowCount} 筆結果`;
+            showStatus(statusMsg, 'success', true);
             document.getElementById('addInput').value = inputValue;
-            showStatus('✅ 查詢完成', 'success', true);
+            showStatus('✅ 已自動填入', 'success');
           }
         } else {
-          showStatus('❌ ' + (data.error || '未知錯誤'), 'error', true);
+          statusMsg = '❌ ' + (data.error || '未知錯誤');
+          showStatus(statusMsg, 'error', true);
         }
       } catch (error) {
-        console.error('查詢錯誤:', error);
-        showStatus('❌ ' + error.message, 'error', true);
+        console.error('錯誤:', error);
+        statusMsg = '❌ ' + error.message;
+        showStatus(statusMsg, 'error', true);
       } finally {
-        const duration = performance.now() - startTime;
-        const statusEl = document.getElementById('searchStatus');
-        if (statusEl.textContent) {
-          statusEl.textContent += ` (${formatDuration(duration)})`;
+        // ⏱️ 結束計時並顯示
+        duration = performance.now() - startTime;
+        const durationStr = formatDuration(duration);
+        
+        // 更新狀態訊息，附加執行時間
+        if (statusMsg) {
+          const finalMsg = `${statusMsg} (⏱️ ${durationStr})`;
+          document.getElementById('searchStatus').textContent = finalMsg;
         }
+        
         btn.classList.remove('loading');
+        btn.textContent = '送出查詢';
         inputBox.value = '';
       }
     }
@@ -1407,20 +1388,23 @@
       document.getElementById('libraryCountBox').innerHTML = html;
       document.getElementById('bookInfoBox').innerHTML = html;
       document.getElementById('librariesBox').innerHTML = html;
+      showStatus('❌ ' + a1Value, 'error', true);
     }
     
     function displaySearchResults(data) {
-      // ... 保持原有顯示邏輯不變 ...
       const bookInfo = data.bookInfo || {};
       const libraries = data.libraries || [];
       const libraryCount = data.libraryCount || 0;
       
+      // 取得位置資料（優先使用 position，其次是 d2）
       let position = '';
       if (data.position !== undefined && data.position !== null && data.position !== '') {
         position = cleanHtmlContent(data.position);
       } else if (data.d2 !== undefined && data.d2 !== null && data.d2 !== '') {
         position = cleanHtmlContent(data.d2);
       }
+      
+      console.log('位置資料:', position);
       
       const isEmpty = !position;
       
@@ -1643,7 +1627,7 @@
       if (e.key === 'Enter') saveDisplayColumnFromModal();
     });
     
-    // 單一更新輸入框限制
+    // 單一更新條碼輸入框限制
     document.getElementById('singleBarcodeInput').addEventListener('input', function() {
       const value = this.value.replace(/\D/g, '');
       if (this.value !== value) this.value = value;
@@ -1660,7 +1644,6 @@
       }
     });
     
-    // 批量更新輸入框
     document.getElementById('batchLocationInput').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         document.getElementById('batchBarcodeInput').focus();
